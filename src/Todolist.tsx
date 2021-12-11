@@ -1,41 +1,52 @@
 import React, {useState} from "react";
-import {actionTasks, TodoStateType} from "./App";
+import {actionTasks, TasksType} from "./App";
 
 type propsType = {
-    state: TodoStateType[]
+    todolistID: string
+    state: TasksType[]
     titleTask: string
-    removeTask: (id: string) => void
-    filterTasks: (filter: actionTasks) => void
-    addTask: (title: string, priority: number) => void
-    filter: string
-    priorityFilter: (filter: number) => void
+    removeTask: (todolistID: string, id: string) => void
+    changeFilter: (todolistID: string, filter: actionTasks) => void
+    addTask: (todolistID: string, title: string, priority: number) => void
+    filter: actionTasks
+    priorityFilter: (todolistID: string, filter: number) => void
     priority: number
-    changeTaskStatus: (id: string, value: boolean | number) => void
+    changeIsDoneStatus: (todolistID: string,id: string, isDone: boolean) => void
+    changeSelectedStatus: (todolistID: string,id: string, priority: number) => void
 }
 
 export const Todolist = ({
                              state,
                              titleTask,
                              removeTask,
-                             filterTasks,
+                             changeFilter,
                              addTask,
                              filter,
                              priorityFilter,
                              priority,
-                             changeTaskStatus,
+                             changeSelectedStatus,
+                             changeIsDoneStatus,
+                             todolistID,
                              ...props
                          }: propsType) => {
     const [title, setTitle] = useState('')
     const [error, setError] = useState('')
-    const [disable, setDisable] = useState(true)
-    const [selectValue, setSelectValue] = useState(1)
+    const [selectValue, setSelectValue] = useState<number>(1)
+
+    const filterTaskSwitch = () => {
+        const priorityFilter = (t: TasksType) => (priority > 0) ? t.priority === priority : t.priority
+        switch (filter) {
+            case "action":
+                return state.filter(t => !t.isDone).filter(priorityFilter)
+            case "completed":
+                return state.filter(t => t.isDone).filter(priorityFilter)
+            default:
+                return state.filter(priorityFilter)
+        }
+    }
+    let tasks = filterTaskSwitch()
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.currentTarget.value === '') {
-            setDisable(true)
-        } else {
-            setDisable(false)
-        }
         setTitle(e.currentTarget.value)
     }
 
@@ -43,9 +54,8 @@ export const Todolist = ({
         if (title.trim() === '') {
             setError('Пустая строка')
         } else {
-            addTask(title, selectValue)
+            addTask( todolistID,title, selectValue)
             setTitle('')
-            setDisable(true)
         }
     }
 
@@ -55,31 +65,27 @@ export const Todolist = ({
         }
     }
 
-    const onChangeHandlerIsDone = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
-        let newIsDone = e.currentTarget.checked
-        changeTaskStatus(id, newIsDone)
-    }
-    const onChangeSelectHandler = (e: React.ChangeEvent<HTMLSelectElement>, id: string) => changeTaskStatus(id, +e.currentTarget.value)
-    const onChangePriorityHandler = (e: React.ChangeEvent<HTMLSelectElement>) => priorityFilter(+e.target.value)
+    const onChangePriorityHandler = (e: React.ChangeEvent<HTMLSelectElement>) => priorityFilter(todolistID, +e.target.value)
+
 
     const getClassName = (value: actionTasks) => filter === value ? 'active' : ''
 
-
-    const jsxTasks = (state.length === 0) ? "Tasks not found" :
-        state.map((t) => {
-            return <li className={t.isDone ? 'isDone' : ''}>
-                <input onChange={(e) => onChangeHandlerIsDone(e, t.id)}
+    const jsxTasks = (tasks.length === 0)
+        ? "Tasks not found" :
+        tasks.map((t) => {
+            return <li key={t.id} className={t.isDone ? 'isDone' : ''}>
+                <input onChange={(e) => changeIsDoneStatus(todolistID, t.id, e.currentTarget.checked)}
                        key={t.id}
                        checked={t.isDone}
                        type={"checkbox"}/>
                 {t.title}
                 <select value={t.priority}
-                        onChange={(e) => onChangeSelectHandler(e, t.id)}>
+                        onChange={(e) => changeSelectedStatus(todolistID,t.id, +e.currentTarget.value)}>
                     <option value={1}>Low</option>
                     <option value={2}>Medium</option>
                     <option value={3}>High</option>
                 </select>
-                <button onClick={() => removeTask(t.id)}>x</button>
+                <button onClick={() => removeTask(todolistID, t.id)}>x</button>
             </li>
         })
 
@@ -87,15 +93,19 @@ export const Todolist = ({
         <div className={'wrapper'}>
             <h3>{titleTask}</h3>
             <div>
-                <input onKeyPress={onChangePressKey} value={title} onChange={onChangeHandler}/>
-                <select value={selectValue}
+                <input onKeyPress={onChangePressKey}
+                       value={title}
+                       onChange={onChangeHandler}/>
+                <select value={selectValue} inputMode={"numeric"}
                         onChange={(e) => setSelectValue(+e.currentTarget.value)}>
                     <option value={1}>Low</option>
                     <option value={2}>Medium</option>
                     <option value={3}>High</option>
                 </select>
 
-                <button disabled={disable} onClick={onClickAddTask}>+</button>
+                <button disabled={title === ''}
+                        onClick={onClickAddTask}>+
+                </button>
                 <div>{error}</div>
             </div>
             <ul>
@@ -103,13 +113,13 @@ export const Todolist = ({
             </ul>
             <div>
                 <button className={getClassName('all')}
-                        onClick={() => filterTasks('all')}>All
+                        onClick={() => changeFilter(todolistID, 'all')}>All
                 </button>
                 <button className={getClassName('completed')}
-                        onClick={() => filterTasks('completed')}>Completed
+                        onClick={() => changeFilter(todolistID, 'completed')}>Completed
                 </button>
                 <button className={getClassName('action')}
-                        onClick={() => filterTasks('action')}>Action
+                        onClick={() => changeFilter(todolistID, 'action')}>Action
                 </button>
 
                 <select value={priority} onChange={onChangePriorityHandler}>

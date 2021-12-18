@@ -16,9 +16,17 @@ body {
 .App {
     padding: 30px;
     display: flex;
+
+    flex-direction: column;
+    justify-content: center;
+
+}
+.todolist__wrapper{
+    display: flex;
+    padding: 30px;
 }
 
-.App > div {
+.App > div > div{
     margin-right: 50px;
 }
 
@@ -28,3 +36,14 @@ body {
 .isDone {
     opacity: 0.5;
  }
+
+.todoList__title__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+.todoList__title__wrapper button {
+    height: 25px;
+    margin: 10px;
+}

@@ -1,14 +1,16 @@
 import React from "react";
-import {SelectionMenuItemType, TasksType} from "./App";
-import {SelectionMap} from "./SelectionMap";
+import {SelectionMenuItemsType, TasksType} from "./App";
+import {EditableSpan} from "./EditableSpan";
+import {EditableSelect} from "./EditableSelect";
 
 type MapTasksType = {
     tasks: TasksType[]
-    changeIsDoneStatus: (todolistID: string, id: string, isDone: boolean) => void
-    changeSelectedStatus: (todolistID: string, id: string, value: string) => void
-    removeTask: (todolistID: string, id: string) => void
+    changeIsDoneStatus: (todolistID: string, taskId: string, isDone: boolean) => void
+    changeSelectedStatus: (todolistID: string, taskId: string, value: string) => void
+    removeTask: (todolistID: string, taskId: string) => void
     todolistID: string
-    selectionMenuItem: SelectionMenuItemType[]
+    selectionMenuItems: SelectionMenuItemsType[]
+    updateTask: (todolistID: string, taskId: string, title: string) => void
 }
 
 export const MapTasks = ({
@@ -17,7 +19,8 @@ export const MapTasks = ({
                              changeSelectedStatus,
                              removeTask,
                              todolistID,
-                             selectionMenuItem
+                             selectionMenuItems,
+                             updateTask
                          }: MapTasksType) => {
 
     const onChangeChecked = (taskId: string, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,26 +30,42 @@ export const MapTasks = ({
     const onChangeSelection = (taskId: string, priority: string) => {
         changeSelectedStatus(todolistID, taskId, priority)
     }
+    const onChangeUpdateTask = (taskId: string, title: string) => {
+        updateTask(todolistID, taskId, title)
+    }
+    const onClickRemove = (taskId: string) => {
+        removeTask(todolistID, taskId)
+    }
+    const styleDiv = (isDone: boolean) => {
+        return             {
+                margin: '10px',
+                opacity: `${isDone ? '0.5' : ''}`
+            }
+
+    }
     return (
-        <ul>
+        <div>
             {(tasks.length === 0)
                 ? "Tasks not found"
                 : tasks.map((t) => {
-                    return <li key={t.id} className={t.isDone ? 'isDone' : ''}>
-                        <input onChange={(e) => onChangeChecked(t.id, e)}
-                               key={t.id}
-                               checked={t.isDone}
-                               type={"checkbox"}/>
-                        {t.title}
-                        <SelectionMap selectionMenuItem={selectionMenuItem}
-                                      value={t.priority}
-                                      onChange={(priority) => onChangeSelection(t.id, priority)}/>
-                        <button onClick={() => removeTask(todolistID, t.id)}>x</button>
-                    </li>
+                    return (
+                        <div key={t.id}
+                             style={styleDiv(t.isDone)}
+                        >
+                            <input onChange={(e) => onChangeChecked(t.id, e)}
+                                   key={t.id}
+                                   checked={t.isDone}
+                                   type={"checkbox"}/>
+                            <EditableSpan onChangeUpdate={(title) => onChangeUpdateTask(t.id, title)}
+                                          title={t.title}/>
+                            <EditableSelect selectionMenuItems={selectionMenuItems}
+                                            value={t.priority}
+                                            onChange={(priority) => onChangeSelection(t.id, priority)}/>
+                            <button onClick={() => onClickRemove(t.id)}>x</button>
+                        </div>
+                    )
                 })}
-        </ul>
+        </div>
     )
-
-
 }
 

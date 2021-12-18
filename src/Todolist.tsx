@@ -1,21 +1,26 @@
-import React, {useState} from "react";
-import {ActionTasks, SelectionMenuItemType, TasksType} from "./App";
+import React from "react";
 import {MapTasks} from "./MapTasks";
 import {SelectionMap} from "./SelectionMap";
+import {ActionTasks, SelectionMenuItemsType, TasksType} from "./App";
+import {EditableSpan} from "./EditableSpan";
+import {Input} from "./Input";
 
 type propsType = {
     todolistID: string
     state: TasksType[]
     titleTask: string
-    removeTask: (todolistID: string, id: string) => void
+    removeTask: (todolistID: string, taskId: string) => void
     changeFilter: (todolistID: string, filter: ActionTasks) => void
     addTask: (todolistID: string, title: string, priority: string) => void
     filter: ActionTasks
     priorityFilter: (todolistID: string, filter: string) => void
     priority: string
-    changeIsDoneStatus: (todolistID: string, id: string, isDone: boolean) => void
-    changeSelectedStatus: (todolistID: string, id: string, value: string) => void
-    selectionMenuItem: SelectionMenuItemType[]
+    changeIsDoneStatus: (todolistID: string, taskId: string, isDone: boolean) => void
+    changeSelectedStatus: (todolistID: string, taskId: string, value: string) => void
+    selectionMenuItems: SelectionMenuItemsType[]
+    updateTask: (todolistID: string, taskId: string, title: string) => void
+    removeTodoList: (todoListId: string) => void
+    updateTodolist: (todoListId: string, title: string) => void
 }
 
 export const Todolist = ({
@@ -30,15 +35,15 @@ export const Todolist = ({
                              changeSelectedStatus,
                              changeIsDoneStatus,
                              todolistID,
-                             selectionMenuItem,
+                             selectionMenuItems,
+                             updateTask,
+                             removeTodoList,
+                             updateTodolist
                          }: propsType) => {
 
-    const [title, setTitle] = useState('')
-    const [error, setError] = useState('')
-    const [selectValue, setSelectValue] = useState<string>('1')
 
     const filterTaskSwitch = () => {
-        const priorityFilter = (t: TasksType) => (+priority > +'0') ? t.priority === priority : t.priority
+        const priorityFilter = (t: TasksType) => (+priority > 0) ? t.priority === priority : t.priority
         switch (filter) {
             case "action":
                 return state.filter(t => !t.isDone).filter(priorityFilter)
@@ -50,63 +55,56 @@ export const Todolist = ({
     }
     const tasks = filterTaskSwitch()
 
-    const onChangeInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitle(e.currentTarget.value)
-    }
-    const onClickAddTask = () => {
-        if (title.trim() === '') {
-            setError('Пустая строка')
-        } else {
-            addTask(todolistID, title, selectValue)
-            setTitle('')
-        }
-    }
-    const onChangePressKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            onClickAddTask()
-        }
-    }
     const onChangePriorityFilterHandler = (priority: string) => {
         priorityFilter(todolistID, priority)
     }
-    const onChangeNewTaskPriority = (priority: string) => {
-        setSelectValue(priority)
-    }
     const getClassName = (value: ActionTasks) => filter === value ? 'active' : ''
     const buttonSort = (action: ActionTasks, nameButton: string) => {
-        return <button className={getClassName(action)}
+        return <button style={{margin: '5px'}}
+                       className={getClassName(action)}
                        onClick={() => changeFilter(todolistID, action)}> {nameButton}
         </button>
+    }
+    const onClickRemoveTodolist = () => {
+        removeTodoList(todolistID)
+    }
+    const onChangeUpdateTodoList = (title: string) => {
+        updateTodolist(todolistID, title)
+    }
+    const addTaskHandler =(title:string, selectionValue?:string)=> {
+        selectionValue &&
+        addTask(todolistID, title, selectionValue)
     }
 
     return (
         <div className={'wrapper'}>
-            <h3>{titleTask}</h3>
-            <div>
-                <input onKeyPress={onChangePressKey}
-                       value={title}
-                       onChange={onChangeInputHandler}/>
-                <SelectionMap selectionMenuItem={selectionMenuItem}
-                              value={selectValue}
-                              onChange={onChangeNewTaskPriority}/>
+            <div className={'todoList__title__wrapper'}>
+                <h3><EditableSpan title={titleTask} onChangeUpdate={onChangeUpdateTodoList}/></h3>
+                <button onClick={onClickRemoveTodolist}>x</button>
+            </div>
 
-                <button disabled={title === ''}
-                        onClick={onClickAddTask}>+
-                </button>
-                <div>{error}</div>
+            <div>
+                <Input addTaskHandler={addTaskHandler}
+                       selectionMenuItems={selectionMenuItems}
+
+                />
             </div>
             <MapTasks tasks={tasks}
                       changeIsDoneStatus={changeIsDoneStatus}
                       changeSelectedStatus={changeSelectedStatus}
                       removeTask={removeTask}
                       todolistID={todolistID}
-                      selectionMenuItem={selectionMenuItem}/>
+                      selectionMenuItems={selectionMenuItems}
+                      updateTask={updateTask}
+            />
             <div>
                 {buttonSort('all', 'All')}
                 {buttonSort('completed', 'Completed')}
                 {buttonSort('action', 'Action')}
-                <SelectionMap selectionMenuItem={selectionMenuItem} value={priority}
-                              onChange={onChangePriorityFilterHandler}>All</SelectionMap>
+                <SelectionMap selectionMenuItems={selectionMenuItems}
+                              value={priority}
+                              onChange={onChangePriorityFilterHandler}
+                >All</SelectionMap>
             </div>
 
         </div>

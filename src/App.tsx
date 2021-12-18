@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {v1} from 'uuid';
 import './App.css';
 import {Todolist} from "./Todolist";
+import {Input} from "./Input";
 
 export type TasksType = {
     id: string
@@ -21,7 +22,7 @@ export type TasksStateType = ({
 export type ActionTasks = 'all' | 'completed' | 'action'
 export type PriorityTask = 'Low' | 'Medium' | 'High'
 
-export type SelectionMenuItemType = {
+export type SelectionMenuItemsType = {
     id: number,
     title: PriorityTask,
     value: string
@@ -53,7 +54,7 @@ function App() {
             {id: v1(), title: "GraphQL2", isDone: false, priority: '1'},
         ]
     }
-    const selectionMenuItem: SelectionMenuItemType[] = [
+    const selectionMenuItems: SelectionMenuItemsType[] = [
         {id: 1, title: 'Low', value: '1'},
         {id: 2, title: 'Medium', value: '2'},
         {id: 3, title: 'High', value: '3'},
@@ -70,8 +71,8 @@ function App() {
         setTodoLists(todoLists.map(tl => tl.id === todolistID ? {...tl, priority} : tl))
     }
 
-    const removeTask = (todolistID: string, id: string) => {
-        setTasks({...tasks, [todolistID]: tasks[todolistID].filter(t => t.id !== id)})
+    const removeTask = (todolistID: string, taskId: string) => {
+        setTasks({...tasks, [todolistID]: tasks[todolistID].filter(t => t.id !== taskId)})
     }
 
     const addTask = (todolistID: string, title: string, priority: string) => {
@@ -81,32 +82,57 @@ function App() {
         })
     }
 
-    const changeExecutionStatus = (todolistID: string, id: string, isDone: boolean) => {
-        setTasks({...tasks, [todolistID]: tasks[todolistID].map(t => t.id === id ? {...t, isDone} : t)})
+    const changeExecutionStatus = (todolistID: string, taskId: string, isDone: boolean) => {
+        setTasks({...tasks, [todolistID]: tasks[todolistID].map(t => t.id === taskId ? {...t, isDone} : t)})
     }
-    const changePriorityStatus = (todolistID: string, id: string, priority: string) => {
-        setTasks({...tasks, [todolistID]: tasks[todolistID].map(t => t.id === id ? {...t, priority} : t)})
+    const changePriorityStatus = (todolistID: string, taskId: string, priority: string) => {
+        setTasks({...tasks, [todolistID]: tasks[todolistID].map(t => t.id === taskId ? {...t, priority} : t)})
+    }
+
+    const removeTodoList = (todolistID: string) => {
+        setTodoLists(todoLists.filter(tl => tl.id !== todolistID))
+        delete tasks[todolistID]
+    }
+
+    const updateTask = (todolistID: string, taskId: string, title: string) => {
+        setTasks({...tasks, [todolistID]: tasks[todolistID].map(t => t.id === taskId ? {...t, title} : t)})
+    }
+    const updateTodolist = (todolistID: string, title: string) => {
+        setTodoLists(todoLists.map(tl => tl.id === todolistID ? {...tl, title} : tl))
+    }
+
+    const addTodolist = (title: string) => {
+        const newTodoList: TodoListType = {id: v1(), title: title, filter: 'all', priority: '0'}
+        setTodoLists([ newTodoList,...todoLists])
+        setTasks({...tasks,[newTodoList.id]: []})
     }
 
     return (
         <div className={'App'}>
-
-            {todoLists.map(tl => {
-                return <Todolist todolistID={tl.id}
-                                 key={tl.id}
-                                 addTask={addTask}
-                                 changeFilter={changeExecutionTasks}
-                                 removeTask={removeTask}
-                                 titleTask={tl.title}
-                                 state={tasks[tl.id]}
-                                 filter={tl.filter}
-                                 priorityFilter={changePriorityTasks}
-                                 priority={tl.priority}
-                                 changeIsDoneStatus={changeExecutionStatus}
-                                 changeSelectedStatus={changePriorityStatus}
-                                 selectionMenuItem={selectionMenuItem}
-                />
-            })}
+            <div>
+                <Input addTaskHandler={addTodolist}/>
+            </div>
+            <div className={'todolist__wrapper'}>
+                {todoLists.map(tl => {
+                    return <Todolist todolistID={tl.id}
+                                     key={tl.id}
+                                     addTask={addTask}
+                                     changeFilter={changeExecutionTasks}
+                                     removeTask={removeTask}
+                                     titleTask={tl.title}
+                                     state={tasks[tl.id]}
+                                     filter={tl.filter}
+                                     priorityFilter={changePriorityTasks}
+                                     priority={tl.priority}
+                                     changeIsDoneStatus={changeExecutionStatus}
+                                     changeSelectedStatus={changePriorityStatus}
+                                     selectionMenuItems={selectionMenuItems}
+                                     updateTask={updateTask}
+                                     removeTodoList={removeTodoList}
+                                     updateTodolist={updateTodolist}
+                    />
+                })}
+            </div>
         </div>
     );
 }

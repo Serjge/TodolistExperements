@@ -16,14 +16,14 @@ export const EditableSelect = ({selectionMenuItems, value, onChange}: EditableSe
         setEdit(false)
     }
 
-
     return (
-        <span style={{padding: '10px', width: '150px', margin: '5px'}} onDoubleClick={clickToEdit}>
+        <span style={{display:'inline-flex', width: '150px', height: '40px',alignItems:'center',paddingLeft:'14px'}} onDoubleClick={clickToEdit}>
             {edit
                 ? <SelectionMap selectionMenuItems={selectionMenuItems}
                                 value={value}
                                 onChange={onChange}
-                                onBlur={clickToCompleteEditing}/>
+                                onBlur={clickToCompleteEditing}
+                autoFocus/>
                 : selectionMenuItems.map(i => i.value === value
                     ? <div style={styleTitle(i.value)}>{i.title}</div>
                     : null)}
@@ -33,8 +33,7 @@ export const EditableSelect = ({selectionMenuItems, value, onChange}: EditableSe
 
 const styleTitle = (value: string) => {
     const style = {
-        width: '70px',
-        display: 'inline-block',
+        display:'inline-flex', width: '120px', height: '40px',alignItems:'center',paddingLeft:'14px',fontWeight:'700'
     }
     switch (value) {
         case '1':

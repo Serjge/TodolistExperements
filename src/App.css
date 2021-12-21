@@ -11,7 +11,7 @@
 /*    text-align: center;*/
 /*}*/
 body {
-    background: dimgray;
+    background: #424242
 }
 .App {
     padding: 30px;
@@ -27,7 +27,7 @@ body {
 }
 
 .App > div > div{
-    margin-right: 50px;
+    /*margin-right: 50px;*/
 }
 
 .active {

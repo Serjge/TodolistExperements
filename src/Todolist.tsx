@@ -4,6 +4,10 @@ import {SelectionMap} from "./SelectionMap";
 import {ActionTasks, SelectionMenuItemsType, TasksType} from "./App";
 import {EditableSpan} from "./EditableSpan";
 import {Input} from "./Input";
+import IconButton from "@mui/material/IconButton";
+import {indigo} from "@mui/material/colors";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Button from "@mui/material/Button";
 
 type propsType = {
     todolistID: string
@@ -58,30 +62,32 @@ export const Todolist = ({
     const onChangePriorityFilterHandler = (priority: string) => {
         priorityFilter(todolistID, priority)
     }
-    const getClassName = (value: ActionTasks) => filter === value ? 'active' : ''
-    const buttonSort = (action: ActionTasks, nameButton: string) => {
-        return <button style={{margin: '5px'}}
-                       className={getClassName(action)}
-                       onClick={() => changeFilter(todolistID, action)}> {nameButton}
-        </button>
-    }
     const onClickRemoveTodolist = () => {
         removeTodoList(todolistID)
     }
     const onChangeUpdateTodoList = (title: string) => {
         updateTodolist(todolistID, title)
     }
-    const addTaskHandler =(title:string, selectionValue?:string)=> {
+    const addTaskHandler = (title: string, selectionValue?: string) => {
         selectionValue &&
         addTask(todolistID, title, selectionValue)
     }
 
     return (
-        <div className={'wrapper'}>
-            <div className={'todoList__title__wrapper'}>
-                <h3><EditableSpan title={titleTask} onChangeUpdate={onChangeUpdateTodoList}/></h3>
-                <button onClick={onClickRemoveTodolist}>x</button>
-            </div>
+        <div >
+
+                <h3><EditableSpan title={titleTask} onChangeUpdate={onChangeUpdateTodoList}/>
+                <IconButton onClick={onClickRemoveTodolist}
+                            aria-label="delete"
+                            sx={{
+                                color: indigo[900],
+                                '&.Mui-checked': {
+                                    color: indigo[900],
+                                },
+                            }}>
+                    <DeleteIcon/>
+                </IconButton>
+                </h3>
 
             <div>
                 <Input addTaskHandler={addTaskHandler}
@@ -97,10 +103,43 @@ export const Todolist = ({
                       selectionMenuItems={selectionMenuItems}
                       updateTask={updateTask}
             />
-            <div>
-                {buttonSort('all', 'All')}
-                {buttonSort('completed', 'Completed')}
-                {buttonSort('action', 'Action')}
+            <div style={{display: 'flex'}}>
+
+                 <Button variant={filter === 'all' ?"contained":'outlined'} color="secondary"
+                               sx={{
+                                   color: indigo[900],
+                                   '&.Mui-checked': {
+                                       color: indigo[900],
+                                   },
+                                   height: ' 30px',
+                                   marginRight:'10px'
+                               }}
+                               onClick={() => changeFilter(todolistID, 'all')}>
+                     All
+                 </Button>
+                <Button variant={filter === 'completed' ?"contained":'outlined'} color="secondary"
+                               sx={{  color: indigo[900],
+                                   '&.Mui-checked': {
+                                       color: indigo[900],
+                                   },
+                                   height: ' 30px',
+                                   marginRight:'10px'
+                               }}
+                               onClick={() => changeFilter(todolistID, 'completed')}>
+                    Completed
+                </Button>
+                <Button variant={filter === 'action' ?"contained":'outlined'} color="secondary"
+                        sx={{
+                            color: indigo[900],
+                            '&.Mui-checked': {
+                                color: indigo[900],
+                            },
+                            height: ' 30px',
+                            marginRight:'10px'
+                        }}
+                        onClick={() => changeFilter(todolistID, 'action')}>
+                    Action
+                </Button>
                 <SelectionMap selectionMenuItems={selectionMenuItems}
                               value={priority}
                               onChange={onChangePriorityFilterHandler}

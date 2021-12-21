@@ -1,3 +1,4 @@
+import TextField from "@mui/material/TextField";
 import React, {useState} from "react";
 import styles from './EditableSpan.module.css'
 
@@ -21,10 +22,15 @@ export const EditableSpan = ({title, onChangeUpdate}: EditableSpanPropsType) => 
     return (
         <span className={styles.span} onDoubleClick={clickToEdit}>
             {edit
-                ? <input className={styles.input} autoFocus onChange={onChangeNewTitle}
-                         value={newTitle}
-                         onBlur={clickToCompleteEditing}
-                         type="text"/>
-                : <span style={{width:'150px', display:'inline-block'}}>{title}</span>}</span>
+                ? <TextField id="outlined-basic"
+                             autoFocus
+                             onChange={onChangeNewTitle}
+                             value={newTitle}
+                             onBlur={clickToCompleteEditing}
+                             variant="outlined"
+                             sx={{width:'164px'}}
+                             size={"small"}
+                />
+                : <p style={{width:'120px', display:'inline-flex', maxHeight:'40px', alignItems:'center', paddingLeft:'14px',textOverflow: 'ellipsis',overflow:'hidden',whiteSpace: 'nowrap',padding: '5px'}}>{title}</p>}</span>
     )
 }

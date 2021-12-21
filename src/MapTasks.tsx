@@ -2,6 +2,9 @@ import React from "react";
 import {SelectionMenuItemsType, TasksType} from "./App";
 import {EditableSpan} from "./EditableSpan";
 import {EditableSelect} from "./EditableSelect";
+import {Checkbox, IconButton} from "@mui/material";
+import {indigo} from "@mui/material/colors";
+import DeleteIcon from '@mui/icons-material/Delete'
 
 type MapTasksType = {
     tasks: TasksType[]
@@ -37,10 +40,10 @@ export const MapTasks = ({
         removeTask(todolistID, taskId)
     }
     const styleDiv = (isDone: boolean) => {
-        return             {
-                margin: '10px',
-                opacity: `${isDone ? '0.5' : ''}`
-            }
+        return {
+            margin: '10px',
+            opacity: `${isDone ? '0.5' : ''}`
+        }
 
     }
     return (
@@ -52,16 +55,32 @@ export const MapTasks = ({
                         <div key={t.id}
                              style={styleDiv(t.isDone)}
                         >
-                            <input onChange={(e) => onChangeChecked(t.id, e)}
-                                   key={t.id}
-                                   checked={t.isDone}
-                                   type={"checkbox"}/>
+                            <Checkbox
+                                checked={t.isDone}
+                                onChange={(e) => onChangeChecked(t.id, e)}
+                                sx={{
+                                    color: indigo[900],
+                                    '&.Mui-checked': {
+                                        color: indigo[900],
+                                    },
+                                }}
+                            />
+
                             <EditableSpan onChangeUpdate={(title) => onChangeUpdateTask(t.id, title)}
                                           title={t.title}/>
                             <EditableSelect selectionMenuItems={selectionMenuItems}
                                             value={t.priority}
                                             onChange={(priority) => onChangeSelection(t.id, priority)}/>
-                            <button onClick={() => onClickRemove(t.id)}>x</button>
+                            <IconButton onClick={() => onClickRemove(t.id)}
+                                        aria-label="delete"
+                                        sx={{
+                                            color: indigo[900],
+                                            '&.Mui-checked': {
+                                                color: indigo[900],
+                                            },
+                                        }}>
+                                <DeleteIcon/>
+                            </IconButton>
                         </div>
                     )
                 })}

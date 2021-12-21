@@ -1,6 +1,10 @@
 import React, {useState} from "react";
 import {SelectionMap} from "./SelectionMap";
 import {SelectionMenuItemsType} from "./App";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+import TextField from "@mui/material/TextField";
+import grey from "@mui/material/colors/grey";
 
 type InputPropsType = {
     addTaskHandler: (title: string, selectionValue?: string | undefined) => void
@@ -37,19 +41,28 @@ export const Input = ({selectionMenuItems, addTaskHandler}: InputPropsType) => {
     return (
         <>
             <div>
-                <input onKeyPress={onChangePressKey}
-                       value={title}
-                       onChange={onChangeInputHandler}
-                       style={{margin: '10px'}}/>
+                <TextField id="outlined-basic"
+                           onChange={onChangeInputHandler}
+                           onKeyPress={onChangePressKey}
+                           value={title}
+                           variant="outlined"
+                           sx={{width:'200px', marginRight:'10px', background:grey[400], borderRadius:'5px'}}
+                           size={"small"}
+                />
                 {selectionMenuItems
-                && <SelectionMap selectionMenuItems={selectionMenuItems}
+                && title !== ''
+                &&<SelectionMap selectionMenuItems={selectionMenuItems}
                                  value={selectValue}
-                                 onChange={onChangeNewTaskPriority}/>
+                                 onChange={onChangeNewTaskPriority}
+                    autoFocus={false}/>
                 }
-                <button disabled={title === ''}
-                        onClick={onClickAddTask}
-                        style={{margin: '10px'}}>+
-                </button>
+                {title !== ''
+                && <IconButton disabled={title === ''}
+                                             onClick={onClickAddTask}
+                                             aria-label="add"
+                >
+                    <AddIcon/>
+                </IconButton>}
                 <div>{error}</div>
             </div>
 

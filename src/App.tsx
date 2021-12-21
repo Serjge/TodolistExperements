@@ -3,6 +3,11 @@ import {v1} from 'uuid';
 import './App.css';
 import {Todolist} from "./Todolist";
 import {Input} from "./Input";
+import Grid from '@mui/material/Grid';
+import ButtonAppBar from './ButtonAppBar';
+import {Container, Paper} from "@mui/material";
+import {grey} from "@mui/material/colors";
+
 
 export type TasksType = {
     id: string
@@ -103,38 +108,46 @@ function App() {
 
     const addTodolist = (title: string) => {
         const newTodoList: TodoListType = {id: v1(), title: title, filter: 'all', priority: '0'}
-        setTodoLists([ newTodoList,...todoLists])
-        setTasks({...tasks,[newTodoList.id]: []})
+        setTodoLists([newTodoList, ...todoLists])
+        setTasks({...tasks, [newTodoList.id]: []})
     }
 
     return (
-        <div className={'App'}>
-            <div>
-                <Input addTaskHandler={addTodolist}/>
-            </div>
-            <div className={'todolist__wrapper'}>
-                {todoLists.map(tl => {
-                    return <Todolist todolistID={tl.id}
-                                     key={tl.id}
-                                     addTask={addTask}
-                                     changeFilter={changeExecutionTasks}
-                                     removeTask={removeTask}
-                                     titleTask={tl.title}
-                                     state={tasks[tl.id]}
-                                     filter={tl.filter}
-                                     priorityFilter={changePriorityTasks}
-                                     priority={tl.priority}
-                                     changeIsDoneStatus={changeExecutionStatus}
-                                     changeSelectedStatus={changePriorityStatus}
-                                     selectionMenuItems={selectionMenuItems}
-                                     updateTask={updateTask}
-                                     removeTodoList={removeTodoList}
-                                     updateTodolist={updateTodolist}
-                    />
-                })}
-            </div>
+        <div>
+            <ButtonAppBar/>
+            <Container fixed>
+                <Grid container style={{padding: "20px"}}>
+                    <Input addTaskHandler={addTodolist}/>
+                </Grid>
+                <Grid container spacing={3}>
+                    {todoLists.map(tl => {
+                        return <Grid item>
+                            <Paper style={{padding: "10px", background: grey[600]}}>
+                                <Todolist todolistID={tl.id}
+                                          key={tl.id}
+                                          addTask={addTask}
+                                          changeFilter={changeExecutionTasks}
+                                          removeTask={removeTask}
+                                          titleTask={tl.title}
+                                          state={tasks[tl.id]}
+                                          filter={tl.filter}
+                                          priorityFilter={changePriorityTasks}
+                                          priority={tl.priority}
+                                          changeIsDoneStatus={changeExecutionStatus}
+                                          changeSelectedStatus={changePriorityStatus}
+                                          selectionMenuItems={selectionMenuItems}
+                                          updateTask={updateTask}
+                                          removeTodoList={removeTodoList}
+                                          updateTodolist={updateTodolist}
+                                /> </Paper>
+                        </Grid>
+                    })}
+                </Grid>
+
+            </Container>
         </div>
     );
 }
 
 export default App;
+
